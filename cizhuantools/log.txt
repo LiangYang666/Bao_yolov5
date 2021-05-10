@@ -1,0 +1,12 @@
+2021-01-05 19:51:35,476 tool5.py[line:55] INFO: a
+2021-01-05 19:51:36,477 tool5.py[line:55] INFO: b
+2021-01-05 19:51:37,478 tool5.py[line:55] INFO: c
+a
+b
+c
+INFO:__main__:a
+INFO:__main__:b
+INFO:__main__:c
+a
+b
+c

@@ -83,7 +83,6 @@ if __name__ == '__main__':
                 return (xml_name, img_name)
         return None
 
-
     executor = ThreadPoolExecutor(max_workers=4)
     for i in executor.map(get_imgs_xmls_list, tqdm(xml_names)):
         if i:
@@ -91,7 +90,6 @@ if __name__ == '__main__':
     # img_xml_datas = [i for i in img_xml_datas if i]
     print(f'\tThere is {len(img_xml_datas)} images with label is available!')
     print("2.Generating the yolo labels to " + xmls_path)
-
 
     def generate_yolotxt_1by1_real(xml_name, img_name):
         try:

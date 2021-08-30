@@ -75,7 +75,7 @@ def crop_one_file(ssub_root_dir):
 
 if __name__ == '__main__':
 
-    src_path = '../../../data/Gucci/OriginalData'
+    src_path = '../../../../data/Gucci/OriginalData'
     assert os.path.exists(src_path), 'wrong source path'
     save_path = os.path.join(src_path, './Classification/data')
     if not os.path.exists(save_path):

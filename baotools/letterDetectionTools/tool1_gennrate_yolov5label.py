@@ -144,6 +144,10 @@ def xml_trans_to_yolo_labels(imgs_path, xmls_path, labels_path, txt_path):
     # 参数 txt_path 要输出的yolo版txt文件位置 一般为 与图片所处的同级路径/all.txt
     categories_name = get_category_names(xmls_path)
     print(categories_name)
+    with open(os.path.join(os.path.dirname(labels_path))+'/categories.txt', 'w') as f:
+        for category_name in categories_name:
+            f.write(category_name+'\n')
+
 
     if not os.path.exists(labels_path):
         os.mkdir(labels_path)

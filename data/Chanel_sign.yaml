@@ -1,0 +1,17 @@
+# COCO 2017 dataset http://cocodataset.org - first 128 training images
+# Train command: python train.py --data coco128.yaml
+# Default dataset location is next to /yolov5:
+#   /parent_folder
+#     /coco128
+#     /yolov5
+
+
+train: ../data/Chanel/LetterDetection/data/sign/all.txt  # 128 images
+val: ../data/Chanel/LetterDetection/data/sign/all.txt  # 128 images
+
+
+
+# number of classes
+nc: 6
+
+names: ['C', 'h', 'a', 'n', 'e', 'L']

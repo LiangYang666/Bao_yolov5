@@ -198,6 +198,16 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
     nb = len(dataloader)  # number of batches
     assert mlc < nc, 'Label class %g exceeds nc=%g in %s. Possible class labels are 0-%g' % (mlc, nc, opt.data, nc - 1)
 
+    # ipdb.set_trace()
+    if True:
+        from matplotlib import pyplot as plt
+        display_image_dir = './display_image'
+        if not os.path.exists(display_image_dir):
+            os.mkdir(display_image_dir)
+        for i in range(batch_size):
+            plt.imsave(os.path.join(display_image_dir, f't{i}.jpg'), np.array(dataset[i][0]).transpose(1,2,0))
+        return
+
     # Process 0
     if rank in [-1, 0]:
         ema.updates = start_epoch * nb // accumulate  # set EMA updates

@@ -929,7 +929,7 @@ def load_image(self, index):
     img = self.imgs[index]
     if img is None:  # not cached
         path = self.img_files[index]
-        img = cv2.imread(path)  # BGR
+        img = cv2.imread(path, cv2.IMREAD_COLOR+cv2.IMREAD_IGNORE_ORIENTATION)  # BGR  忽略读取图片的exif信息，即转向信息 适合包检测·时使用的时labelimg，即标注图片不会按照exif信息旋转
         # img = cv2.imdecode(np.fromfile(os.path.join(path), dtype=np.uint8), cv2.IMREAD_COLOR)   # 适合中文
         assert img is not None, 'Image Not Found ' + path
         h0, w0 = img.shape[:2]  # orig hw

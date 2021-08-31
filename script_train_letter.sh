@@ -3,7 +3,7 @@ train_letter.py \
 --img 640 \
 --brand Chanel \
 --part sign \
---batch 4 \
+--batch 6 \
 --epochs 60000 \
 --weights yolov5s.pt \
 --device 0 \

@@ -63,7 +63,7 @@ imgaug_seq = iaa.Sequential(
                        iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05 * 255), per_channel=0.5),
                        # add gaussian noise to images
 
-                       iaa.Sometimes(0.3, iaa.Cartoon()),
+                       # iaa.Sometimes(0.3, iaa.Cartoon()),
                        # iaa.OneOf([
                        #     iaa.Dropout((0.01, 0.1), per_channel=0.5),  # randomly remove up to 10% of the pixels
                        #     iaa.CoarseDropout((0.03, 0.05), size_percent=(0.01, 0.03), per_channel=0.2),
@@ -83,11 +83,11 @@ imgaug_seq = iaa.Sequential(
                        ]),
                        iaa.LinearContrast((0.5, 2.0), per_channel=0.5),  # improve or worsen the contrast
                        # iaa.Grayscale(alpha=(0.0, 1.0)),
-                       sometimes(iaa.ElasticTransformation(alpha=(0.5, 2.5), sigma=0.25)),
+                       # sometimes(iaa.ElasticTransformation(alpha=(0.5, 2.5), sigma=0.25)),
                        # move pixels locally around (with random strengths)
-                       sometimes(iaa.PiecewiseAffine(scale=(0.01, 0.02))),
+                       # sometimes(iaa.PiecewiseAffine(scale=(0.01, 0.02))),
                        # sometimes move parts of the image around
-                       sometimes(iaa.PerspectiveTransform(scale=(0.01, 0.05))),
+                       # sometimes(iaa.PerspectiveTransform(scale=(0.01, 0.05))),
 
                        iaa.ChangeColorTemperature((1100, 10000))
                    ],

@@ -201,7 +201,7 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
     assert mlc < nc, 'Label class %g exceeds nc=%g in %s. Possible class labels are 0-%g' % (mlc, nc, opt.data, nc - 1)
 
     # ipdb.set_trace()
-    if True:        # 存储第一批数据增强后的数据
+    if False:        # 存储第一批数据增强后的数据
         from matplotlib import pyplot as plt
         display_image_dir = './display_image'
         if not os.path.exists(display_image_dir):
@@ -373,7 +373,9 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
                 ema.update_attr(model, include=['yaml', 'nc', 'hyp', 'gr', 'names', 'stride'])
             final_epoch = epoch + 1 == epochs
             # time.sleep(5)
-            if (not opt.notest or final_epoch) and (epoch+1) % 10 == 0:  # Calculate mAP
+
+            if ((not opt.notest) and (epoch+1) % opt.test_inter == 0) or final_epoch:  # Calculate mAP
+            # if (not opt.notest or final_epoch) and (epoch+1) % 10 == 0:  # Calculate mAP
                 results, maps, times = test.test(opt.data,
                                                  batch_size=total_batch_size,
                                                  imgsz=imgsz_test,
@@ -420,7 +422,7 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
                 # Save last, best and delete
 
                 ckp_info = opt.train_txt.split('.')[0]+f'_{nc}c'
-                if (epoch+1) % 10 == 0:
+                if (epoch + 1) % opt.save_inter == 0:
                     torch.save(ckpt, str(wdir)+os.sep+f'ckp_{ckp_info}_epoch{epoch + 1}.pt')
                 torch.save(ckpt, last)
                 if best_fitness == fi:
@@ -491,6 +493,8 @@ if __name__ == '__main__':
     parser.add_argument('--project', default='runs/train', help='save to project/name')
     parser.add_argument('--name', default='exp', help='save to project/name')
     parser.add_argument('--exist-ok', action='store_true', help='existing project/name ok, do not increment')
+    parser.add_argument('--save-inter', type=int, default=10, help='How long is the interval to save epoch')
+    parser.add_argument('--test-inter', type=int, default=10, help='How long is the interval to save epoch')
     opt = parser.parse_args()
 
     # python -m torch.distributed.launch --nproc_per_node 2 train_YL.py --img 640 --batch 64 --epochs 600 --data data/zxdata.yaml --weights yolov5s.pt --cfg yolov5szx0.yaml --device 0,1 -train allzx0.txt -test testzx0.txt

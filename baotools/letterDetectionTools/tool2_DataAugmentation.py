@@ -43,24 +43,26 @@ imgaug_seq = iaa.Sequential(
         # don't execute all of them, as that would often be way too strong
         iaa.SomeOf((3, 6),
                    [
-                       sometimes(iaa.Superpixels(p_replace=(0, 0.2), n_segments=100)),
+                       # sometimes(iaa.Superpixels(p_replace=(0, 0.2), n_segments=100)),    # 去除临近填充
                        # convert images into their superpixel representation
-                       iaa.OneOf([
-                           iaa.GaussianBlur((0, 3.0)),  # blur images with a sigma between 0 and 3.0
-                           iaa.AverageBlur(k=(2, 7)),
-                           # blur image using local means with kernel sizes between 2 and 7
-                           iaa.MedianBlur(k=(3, 11)),
-                           # blur image using local medians with kernel sizes between 2 and 7
-                       ]),
-                       iaa.Sharpen(alpha=(0, 1.0), lightness=(0.85, 1.2)),  # sharpen images
-                       iaa.Emboss(alpha=(0, 1.0), strength=(0, 1.5)),  # emboss images
+                       # iaa.OneOf([
+                       #     iaa.GaussianBlur((0, 3.0)),  # blur images with a sigma between 0 and 3.0
+                       #     iaa.AverageBlur(k=(2, 7)),
+                       #     # blur image using local means with kernel sizes between 2 and 7
+                       #     iaa.MedianBlur(k=(3, 11)),
+                       #     # blur image using local medians with kernel sizes between 2 and 7
+                       # ]),
+
+                       iaa.GaussianBlur((0, 2.0)),  # blur images with a sigma between 0 and 3.0
+                       iaa.Sharpen(alpha=(0, 0.2), lightness=(0.85, 1.2)),  # sharpen images
+                       iaa.Emboss(alpha=(0, 0.1), strength=(0, 1.5)),  # emboss images
                        # search either for all edges or for directed edges,
                        # blend the result with the original image using a blobby mask
                        iaa.SimplexNoiseAlpha(iaa.OneOf([
-                           iaa.EdgeDetect(alpha=(0.2, 0.35)),
-                           iaa.DirectedEdgeDetect(alpha=(0.2, 0.36), direction=(0.0, 1.0)),
+                           iaa.EdgeDetect(alpha=(0.1, 0.16)),
+                           iaa.DirectedEdgeDetect(alpha=(0.1, 0.16), direction=(0.0, 1.0)),
                        ])),
-                       iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05 * 255), per_channel=0.5),
+                       iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.015 * 255), per_channel=0.5),
                        # add gaussian noise to images
 
                        # iaa.Sometimes(0.3, iaa.Cartoon()),
@@ -71,17 +73,17 @@ imgaug_seq = iaa.Sequential(
                        iaa.Invert(0.05, per_channel=True),  # invert color channels
                        iaa.Add((-10, 10), per_channel=0.5),
                        # change brightness of images (by -10 to 10 of original value)
-                       iaa.Pepper(0.1),  # 添加椒盐噪声
+                       iaa.Pepper(0.03),  # 添加椒盐噪声
 
                        iaa.OneOf([
-                           iaa.Multiply((0.8, 1.2), per_channel=0.5),
+                           iaa.Multiply((0.9, 1.1), per_channel=0.5),
                            iaa.FrequencyNoiseAlpha(
                                exponent=(-4, 0),
                                first=iaa.Multiply((0.8, 1.2), per_channel=True),
                                second=iaa.LinearContrast((0.5, 2.0))
                            )
                        ]),
-                       iaa.LinearContrast((0.5, 2.0), per_channel=0.5),  # improve or worsen the contrast
+                       iaa.LinearContrast((0.7, 1.2), per_channel=0.5),  # improve or worsen the contrast
                        # iaa.Grayscale(alpha=(0.0, 1.0)),
                        # sometimes(iaa.ElasticTransformation(alpha=(0.5, 2.5), sigma=0.25)),
                        # move pixels locally around (with random strengths)
@@ -135,25 +137,25 @@ seq_test = iaa.Sequential([
 
     # # convert images into their superpixel representation
     # iaa.OneOf([
-    #     iaa.GaussianBlur((0, 3.0)),  # blur images with a sigma between 0 and 3.0
-    #     iaa.AverageBlur(k=(2, 7)),
+    #     iaa.GaussianBlur(2),  # blur images with a sigma between 0 and 3.0
+    #     iaa.AverageBlur(k=7),
     #     # blur image using local means with kernel sizes between 2 and 7
     #     iaa.MedianBlur(k=(3, 11)),
     #     # blur image using local medians with kernel sizes between 2 and 7
     # ]),
 
-    # iaa.Sharpen(alpha=(0, 1.0), lightness=(0.85, 1.15)),  # sharpen images
+    iaa.Sharpen(alpha=0.2, lightness=(0.85, 1.15)),  # sharpen images
 
-    # iaa.Emboss(alpha=(0, 1.0), strength=(0, 2.0)),  # emboss images
+    iaa.Emboss(alpha=0.1, strength=(0, 2.0)),  # emboss images
 
     # # search either for all edges or for directed edges,
     # # blend the result with the original image using a blobby mask
-    # iaa.SimplexNoiseAlpha(iaa.OneOf([
-    #     iaa.EdgeDetect(alpha=(0.3, 0.45)),
-    #     iaa.DirectedEdgeDetect(alpha=(0.3, 0.45), direction=(0.0, 1.0)),
-    # ])),
+    iaa.SimplexNoiseAlpha(iaa.OneOf([
+        iaa.EdgeDetect(alpha=0.15),
+        iaa.DirectedEdgeDetect(alpha=0.15, direction=(0.0, 1.0)),
+    ])),
 
-    # iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05 * 255), per_channel=0.5),
+    iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05 * 255), per_channel=0.5),
     # # add gaussian noise to images
     #
     # iaa.Sometimes(0.3, iaa.Cartoon()),
@@ -216,8 +218,8 @@ def main():
 
     images_aug = []
     for image in images:
-        images_aug.append(aug_one_image(image, imgaug_seq))
-        # images_aug.append(aug_one_image(image, seq_test))
+        # images_aug.append(aug_one_image(image, imgaug_seq))
+        images_aug.append(aug_one_image(image, seq_test))
     id = 0
 
     while id < len(images_aug):

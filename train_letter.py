@@ -206,7 +206,7 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
         display_image_dir = './display_image'
         if not os.path.exists(display_image_dir):
             os.mkdir(display_image_dir)
-        for i in range(batch_size):
+        for i in range(len(dataset)):
             img = np.array(dataset[i][0]).transpose(1,2,0).astype(np.uint8).copy()
             labels = np.array(dataset[i][1])
             width = img.shape[1]

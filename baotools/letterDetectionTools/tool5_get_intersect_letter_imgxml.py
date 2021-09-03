@@ -133,7 +133,7 @@ if __name__ == "__main__":
             if img_name in copied_img_names:
                 detected_selected_info[img_name] = detected_info[img_name]
         print(f'{category}({category_id}): total {total}')
-        with open(os.path.join(dst_img_dir, f'{category}_intersect_dicts.json')) as f:
+        with open(os.path.join(dst_img_dir, f'{category}_intersect_dicts.json'), 'w') as f:
             json.dump(detected_selected_info, f, indent=2)
 
 

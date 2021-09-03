@@ -113,8 +113,12 @@ if __name__ == "__main__":
         if len(detected_info[img_name])!=len(categories):
             warnings.warn(f'{img_name} 可能未准确识别到')
     print('all_categories: ', categories)
+    dst_p_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_2_handle/2与1重复出现且对某字母打了标签的'
+    if not os.path.exists(dst_p_dir):
+        os.mkdir(dst_p_dir)
+
     for category in categories:
-        dst_img_dir = dst_xml_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_2_handle/2{category}与1重复出现且对{category}打了标签的'
+        dst_img_dir = dst_xml_dir = os.path.join(dst_p_dir, f'2{category}与1重复出现且对{category}打了标签的')
         if os.path.exists(dst_img_dir):
             shutil.rmtree(dst_img_dir)
         os.mkdir(dst_img_dir)

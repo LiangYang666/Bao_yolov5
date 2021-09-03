@@ -127,7 +127,16 @@ if __name__ == "__main__":
         for img_name in img_names:
             if copy_intersect_img_xml(detected_info, img_name, category_id, src_img_dir, src_xml_dir, dst_img_dir, dst_xml_dir):
                 total += 1
+        copied_img_names = os.listdir(dst_img_dir)
+
+        detected_selected_info = {}
+        for img_name in detected_info.keys():
+            if img_name in copied_img_names:
+                detected_selected_info[img_name] = detected_info[img_name]
         print(f'{category}({category_id}): total {total}')
+        with open(os.path.join(dst_img_dir, f'{category}_intersect_dicts.json')) as f:
+            json.dump(detected_selected_info, f, indent=2)
+
 
 
 

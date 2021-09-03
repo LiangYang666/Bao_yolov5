@@ -100,7 +100,6 @@ if __name__ == "__main__":
     part = 'sign'
     detected_img_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_2_handle/1detect_select_ok'
     categories_file = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/categories.txt'
-
     src_img_dir = src_xml_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_2_need_已鉴定标记_包含标签旋转后'
 
     detected_info = get_json_info(detected_img_dir)
@@ -118,7 +117,7 @@ if __name__ == "__main__":
         os.mkdir(dst_p_dir)
 
     for category in categories:
-        dst_img_dir = dst_xml_dir = os.path.join(dst_p_dir, f'2{category}与1重复出现且对{category}打了标签的')
+        dst_img_dir = dst_xml_dir = os.path.join(dst_p_dir, category)
         if os.path.exists(dst_img_dir):
             shutil.rmtree(dst_img_dir)
         os.mkdir(dst_img_dir)

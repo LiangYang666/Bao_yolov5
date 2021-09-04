@@ -11,6 +11,7 @@ import shutil
 import warnings
 import xml.etree.ElementTree as ET
 
+
 def calculate_iou(bbox1, bbox2):
     bb = bbox1
     bbgt = bbox2
@@ -23,7 +24,6 @@ def calculate_iou(bbox1, bbox2):
         ua = (bb[2] - bb[0] + 1) * (bb[3] - bb[1] + 1) + (bbgt[2] - bbgt[0] + 1) * (bbgt[3] - bbgt[1] + 1) - iw * ih
         ov = iw * ih / ua
     return ov
-
 
 
 def check_if_intersect(xml_path, xyxy):
@@ -39,6 +39,7 @@ def check_if_intersect(xml_path, xyxy):
         if calculate_iou(xyxy, [x1,y1,x2,y2])>0.2:
             return True
     return False
+
 
 def get_detected_xyxy_of_category(detected_info, img_name, category_id):
     # 获取检测到的json文件中指定的category对应的xyxy框
@@ -74,8 +75,6 @@ def get_json_info(detected_img_dir):
     return detected_info
 
 
-
-
 def copy_intersect_img_xml(detected_info, detected_img_name, category_id, src_img_dir, src_xml_dir, dst_img_dir, dst_xml_dir):
     # detected_img_name = 'Chanel-2-doing_710803_金属件_sign.jpg'
     xml_name = detected_img_name.rsplit('.', 1)[0]+'.xml'
@@ -91,8 +90,6 @@ def copy_intersect_img_xml(detected_info, detected_img_name, category_id, src_im
             shutil.copy(src, dst)
             return True
     return False
-
-
 
 
 if __name__ == "__main__":

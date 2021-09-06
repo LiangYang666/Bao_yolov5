@@ -72,6 +72,7 @@ if __name__ == "__main__":
     # 数据集
     train_dataset = BaoClassicationDataset(os.path.join(data_dir, 'train'), transform=transforms.Compose([
         transforms.Resize((image_size, image_size)),
+        transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3),
         transforms.ToTensor(),
         normalize,
     ]))

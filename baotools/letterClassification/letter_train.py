@@ -31,7 +31,6 @@ class BaoClassicationDataset(Dataset):  # for training/testing
     def __len__(self):
         return len(self.data)
 
-
     def __getitem__(self, i):
         path, label = self.data[i], self.labels[i]
         image = Image.open(path)

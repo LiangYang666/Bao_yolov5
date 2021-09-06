@@ -45,7 +45,7 @@ class BaoClassicationDataset(Dataset):  # for training/testing
 if __name__ == "__main__":
 
     epochs = 1000
-    test_inter = 20
+    test_inter = 2
     save_inter = 100
     image_size = 640
     batch_size = 8
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         transforms.ToTensor(),
         normalize,
     ]))
-    test_loder = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+    test_loder = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
 
     for epoch in range(epochs):
         running_loss = 0.0
@@ -104,13 +104,17 @@ if __name__ == "__main__":
             _, predicted = torch.max(pred.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
-        print(f'Epoch:{epoch} Train accuracy: {100 * correct / total}%')
+        print(f'Epoch:{epoch} Train accuracy: {100 * correct / total}%  {correct}/{total}')
 
 
         if epoch % test_inter == 0:
             with torch.no_grad():
                 model.eval()
+
+                total = 0
+                correct = 0
                 for i, data in enumerate(test_loder):
+                    inputs, labels = data
                     inputs = inputs.to(device)
                     labels = labels.to(device)
 
@@ -118,4 +122,4 @@ if __name__ == "__main__":
                     _, predicted = torch.max(pred.data, 1)
                     total += labels.size(0)
                     correct += (predicted == labels).sum().item()
-                print(f'*****------*****Test accuracy: {100 * correct / total}%')
+                print(f'*****------*****Test accuracy: {100 * correct / total}% {correct}/{total}')

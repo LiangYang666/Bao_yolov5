@@ -38,7 +38,7 @@ def get_image_name(xml, imgs):
     return None
 
 
-def get_category_names(xmls_path):
+def get_category_names_from_xml(xmls_path):
     xmls = os.listdir(xmls_path)
     category_names = []
     xmls = [x for x in xmls if x.rsplit('.', 1)[-1].lower()=='xml']
@@ -142,7 +142,7 @@ def xml_trans_to_yolo_labels(imgs_path, xmls_path, labels_path, txt_path):
     # 参数 xmls_path xml文件的父级目录
     # 参数 labels_path 要输出的yolo版标签txt文件位置 一般为 与图片所处的同级路径/labels
     # 参数 txt_path 要输出的yolo版txt文件位置 一般为 与图片所处的同级路径/all.txt
-    categories_name = get_category_names(xmls_path)
+    categories_name = get_category_names_from_xml(xmls_path)
     print(categories_name)
     with open(os.path.join(os.path.dirname(labels_path))+'/categories.txt', 'w') as f:
         for category_name in categories_name:

@@ -3,7 +3,12 @@
 # @FileName  :letter_train.py.py
 # @Time      :2021/9/6 下午12:49
 # @Author    :Yangliang
+import argparse
+import logging
 import os
+import sys
+
+import numpy as np
 import torch
 import torchvision.models
 from PIL import Image
@@ -15,8 +20,8 @@ class BaoClassicationDataset(Dataset):  # for training/testing
     def __init__(self, dataDir, transform):
         data = []
         label = []
-        classes = os.listdir(dataDir)
-        for i, c in enumerate(classes):
+        # classes = os.listdir(dataDir)
+        for i, c in enumerate(['true', 'fake']):
             img_names = os.listdir(os.path.join(dataDir, c))
             img_path = [os.path.join(dataDir, c, x) for x in img_names]
             data += img_path
@@ -42,54 +47,130 @@ class BaoClassicationDataset(Dataset):  # for training/testing
         image = self.transform(background)
         return image, label
 
+
+def get_model():
+    # 模型
+    model = torchvision.models.resnet34()
+    model.fc = torch.nn.Linear(model.fc.in_features, out_features=2)
+    model.name = 'resnet34'
+    return model
+
+
+def init_logger(log_file=None, log_dir=None, log_level=logging.INFO, mode='w', stdout=True):
+    """
+    log_dir:
+    mode: 'a', append; 'w',
+    """
+    import datetime
+
+    def get_date_str():
+        now = datetime.datetime.now()
+        return now.strftime('%Y-%m-%d_%H-%M-%S')
+
+    fmt = '%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s: %(message)s'
+    if log_dir is None:
+        log_dir = '~/temp/log/'
+    if log_file is None:
+        log_file = 'log_' + get_date_str() + '.txt'
+    else:
+        log_file = 'log_' + log_file + '_' + get_date_str() + '.txt'
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    log_file = os.path.join(log_dir, log_file)
+    print('log file path:' + log_file)
+
+    logging.basicConfig(level=logging.DEBUG,
+                        format=fmt,
+                        filename=log_file,
+                        filemode=mode)
+
+    if stdout:
+        console = logging.StreamHandler(stream=sys.stdout)
+        console.setLevel(log_level)
+        formatter = logging.Formatter(fmt)
+        console.setFormatter(formatter)
+        logging.getLogger('').addHandler(console)
+
+    return logging
+
+
+def cheeck_create_dir(dir):
+    if not os.path.exists(dir):
+        os.mkdir(dir)
+        print(f'create the dir {dir}')
+
+
 if __name__ == "__main__":
 
-    epochs = 1000
-    test_inter = 2
-    save_inter = 100
-    image_size = 640
-    batch_size = 8
-    brand = 'Chanel'
-    part = 'sign'
-    letter = 'C'
-    data_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/classification_data/{letter}'
+    parser = argparse.ArgumentParser(description='PyTorch Prototypical Networks Training')
+    parser.add_argument('--epochs', type=str, default=1000)
+    parser.add_argument('--test_inter', type=int, default=1)
+    parser.add_argument('--save_inter', type=int, default=100)
+    parser.add_argument('--image_size', type=int, default=400)
+    parser.add_argument('--batch_size', type=int, default=20)
+    parser.add_argument('--brand', type=str, default='Chanel')
+    parser.add_argument('--part', type=str, default='sign')
+    parser.add_argument('--letter', type=str, default='C')
+
+    args = parser.parse_args()
+    args.data_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{args.brand}/LetterDetection/data/{args.part}/classification_data/{args.letter}'
+    args.run_data_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{args.brand}/LetterDetection/data/{args.part}/classification_rundata/{args.letter}'
+    args.log_dir = os.path.join(args.run_data_dir, 'log')
+
+    cheeck_create_dir(args.run_data_dir)
+    cheeck_create_dir(args.log_dir)
 
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
     # 模型
-    model = torchvision.models.resnet34(pretrained=True)
-    model.fc = torch.nn.Linear(model.fc.in_features, out_features=2)
-    # model.cuda()
+    model = get_model()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print("device = ", device)
     model.to(device=device)
 
     # 损失函数
     criterion = torch.nn.CrossEntropyLoss()
+    args.criterion = criterion
+
     # 优化器
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+    args.optimizer = optimizer
 
     # 数据集
-    train_dataset = BaoClassicationDataset(os.path.join(data_dir, 'train'), transform=transforms.Compose([
-        transforms.Resize((image_size, image_size)),
-        transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3),
+    train_dataset = BaoClassicationDataset(os.path.join(args.data_dir, 'train'), transform=transforms.Compose([
+        transforms.Resize((args.image_size, args.image_size)),
+        transforms.ColorJitter(brightness=0.3, contrast=0.1, saturation=0, hue=0.3),
         transforms.ToTensor(),
         normalize,
     ]))
-    train_loder = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+    train_loder = DataLoader(dataset=train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)
 
-    test_dataset = BaoClassicationDataset(os.path.join(data_dir, 'test'), transform=transforms.Compose([
-        transforms.Resize((image_size, image_size)),
+    test_dataset = BaoClassicationDataset(os.path.join(args.data_dir, 'test'), transform=transforms.Compose([
+        transforms.Resize((args.image_size, args.image_size)),
         transforms.ToTensor(),
         normalize,
     ]))
-    test_loder = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+    test_loder = DataLoader(dataset=test_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)
 
-    for epoch in range(epochs):
+    # 初始化log文件
+    logging = init_logger(log_dir=args.log_dir, log_file=model.name)
+    logging.info(f"\tmodel:{model.name}")
+    logging.info(f"参数")
+    message_args = str(args.__dict__)
+    message_args = message_args.split('{', 1)[-1]
+    message_args = message_args.rsplit('}', 1)[0]
+    messages = message_args.split(',')
+    for s in messages:
+        logging.info(s.strip())
+
+    # 开始训练
+    for epoch in range(args.epochs):
         running_loss = 0.0
         model.train()
         total = 0
         correct = 0
+        class_correct = [0] * 2
+        class_total = [0] * 2
         for i, data in enumerate(train_loder):
             inputs, labels = data
 
@@ -105,15 +186,25 @@ if __name__ == "__main__":
             _, predicted = torch.max(pred.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
-        print(f'Epoch:{epoch} Train accuracy: {100 * correct / total}%  {correct}/{total}')
 
-
-        if epoch % test_inter == 0:
+            # 计算各个类别的准确率
+            c = (predicted == labels).squeeze()
+            for i in range(labels.size(0)):
+                label = labels[i]
+                class_total[label] += 1
+                class_correct[label] += c[i].item()
+        message_train = f'Epoch:{epoch} Train accuracy: {100 * correct / total:3.1f}% {correct}/{total}' \
+                        f'\ttrue:{(100 * class_correct[0] / class_total[0]):3.1f}%  {class_correct[0]}/{class_total[0]}'
+        # 测试
+        if epoch % args.test_inter == 0:
             with torch.no_grad():
                 model.eval()
 
                 total = 0
                 correct = 0
+                class_correct = [0] * 2
+                class_total = [0] * 2
+
                 for i, data in enumerate(test_loder):
                     inputs, labels = data
                     inputs = inputs.to(device)
@@ -123,4 +214,14 @@ if __name__ == "__main__":
                     _, predicted = torch.max(pred.data, 1)
                     total += labels.size(0)
                     correct += (predicted == labels).sum().item()
-                print(f'*****------*****Test accuracy: {100 * correct / total}% {correct}/{total}')
+
+                    # 计算各个类别的准确率
+                    c = (predicted == labels).squeeze()
+                    for i in range(labels.size(0)):
+                        label = labels[i]
+                        class_total[label] += 1
+                        class_correct[label] += c[i].item()
+                message_test = f'\tTest accuracy: {100 * correct / total:3.1f}% {correct}/{total}' \
+                               f'\ttrue:{(100 * class_correct[0] / class_total[0]):3.1f}%  {class_correct[0]}/{class_total[0]} ' \
+                               f'\tfake:{(100 * class_correct[1] / class_total[1]):3.1f}%  {class_correct[1]}/{class_total[1]}'
+                logging.info(message_train+message_test)

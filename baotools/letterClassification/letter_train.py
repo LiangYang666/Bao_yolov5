@@ -15,6 +15,8 @@ from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 
+from baotools.letterClassification.model import get_model
+
 
 class BaoClassicationDataset(Dataset):  # for training/testing
     def __init__(self, dataDir, transform):
@@ -48,13 +50,6 @@ class BaoClassicationDataset(Dataset):  # for training/testing
         return image, label
 
 
-def get_model():
-    # 模型
-    model = torchvision.models.resnet34()
-    model.fc = torch.nn.Linear(model.fc.in_features, out_features=2)
-    model.name = 'resnet34'
-    return model
-
 
 def init_logger(log_file=None, log_dir=None, log_level=logging.INFO, mode='w', stdout=True):
     """
@@ -73,7 +68,7 @@ def init_logger(log_file=None, log_dir=None, log_level=logging.INFO, mode='w', s
     if log_file is None:
         log_file = 'log_' + get_date_str() + '.txt'
     else:
-        log_file = 'log_' + log_file + '_' + get_date_str() + '.txt'
+        log_file = log_file + '_' + get_date_str() + '.txt'
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     log_file = os.path.join(log_dir, log_file)
@@ -123,7 +118,7 @@ if __name__ == "__main__":
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
     # 模型
-    model = get_model()
+    model = get_model('resnet101')
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print("device = ", device)
     model.to(device=device)

@@ -533,7 +533,7 @@ if __name__ == '__main__':
         opt.name = 'evolve' if opt.evolve else opt.name
         # save_name_add = opt.train_txt.split('.')[0]     # 名称中要增加保存的字符
         # opt.save_dir = increment_path(Path(opt.data_dir).parent / 'train' /(opt.name+f'_{save_name_add}_'), exist_ok=opt.exist_ok | opt.evolve)  # increment run
-        opt.save_dir = increment_path(Path(opt.data_dir).parent / 'yolov5_rundata/train', exist_ok=opt.exist_ok | opt.evolve)
+        opt.save_dir = increment_path(Path(opt.data_dir) / 'yolov5_rundata/train', exist_ok=opt.exist_ok | opt.evolve)
 
     # DDP mode
     device = select_device(opt.device, batch_size=opt.batch_size)

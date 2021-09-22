@@ -8,12 +8,14 @@ import xml.etree.ElementTree as ET
 
 import PIL.Image
 from concurrent.futures import ThreadPoolExecutor
+
+import yaml
 from PIL import ImageFile
 from tqdm import tqdm
 
 
-def get_boxes_from_xml(file):
-    tree = ET.parse(file)  # 获取xml文件
+def get_boxes_from_xml(file_path):
+    tree = ET.parse(file_path)  # 获取xml文件
     root = tree.getroot()
     filename = root.find('filename').text
     # object = root.find('object')
@@ -135,7 +137,7 @@ def get_imgs_xmls_datas(xml_names: list, img_names: list,
 
     return img_xml_datas
 
-def xml_trans_to_yolo_labels(imgs_path, xmls_path, labels_path, txt_path):
+def xml_trans_to_yolo_labels(imgs_path, xmls_path, labels_path, txt_path, categories_path, yaml_path):
     # 将xml版本的标签转换为yolo v5版本的标签
 
     # 参数 imgs_path 图片文件的父级目录
@@ -144,10 +146,17 @@ def xml_trans_to_yolo_labels(imgs_path, xmls_path, labels_path, txt_path):
     # 参数 txt_path 要输出的yolo版txt文件位置 一般为 与图片所处的同级路径/all.txt
     categories_name = get_category_names_from_xml(xmls_path)
     print(categories_name)
-    with open(os.path.join(os.path.dirname(labels_path))+'/categories.txt', 'w') as f:
+    with open(categories_path, 'w') as f:
         for category_name in categories_name:
             f.write(category_name+'\n')
-
+    with open(yaml_path, 'w', encoding='utf-8') as f:
+        save_yaml = {
+            'names': categories_name,
+            'nc': len(categories_name),
+            'train': txt_path,
+            'test': txt_path
+        }
+        yaml.dump(save_yaml, f)
 
     if not os.path.exists(labels_path):
         os.mkdir(labels_path)
@@ -162,27 +171,15 @@ def xml_trans_to_yolo_labels(imgs_path, xmls_path, labels_path, txt_path):
     write_all_yolo_labels_and_txts(img_xml_datas, imgs_path, xmls_path, categories_name, labels_path, txt_path)
 
 
+brand = 'LV'
+part = 'sign'
+
 if __name__ == "__main__":
-    brand = 'Chanel'
-    part = 'sign'
     path = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}'
     labels_path = os.path.join(path, 'labels')
     imgxmls_path = os.path.join(path, 'imgxmls')
     all_txts_path = os.path.join(path, 'all.txt')
+    categories_path = os.path.join(path, 'categories.txt')
+    yaml_path = f'/media/D_4TB/YL_4TB/BaoDetection/Bao_yolov5-master/data/{brand}_{part}.yaml'
 
-    xml_trans_to_yolo_labels(imgxmls_path, imgxmls_path, labels_path, all_txts_path)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    xml_trans_to_yolo_labels(imgxmls_path, imgxmls_path, labels_path, all_txts_path, categories_path, yaml_path)

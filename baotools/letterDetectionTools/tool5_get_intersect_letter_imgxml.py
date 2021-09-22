@@ -43,9 +43,11 @@ def check_if_intersect(xml_path, xyxy):
 
 def get_detected_xyxy_of_category(detected_info, img_name, category_id):
     # 获取检测到的json文件中指定的category对应的xyxy框
-    bboxs = detected_info[img_name][category_id]
-    assert len(bboxs) == 1
-    return bboxs[0]
+    if detected_info[img_name].__contains__(category_id):
+        bboxs = detected_info[img_name][category_id]
+    else:
+        bboxs = []
+    return bboxs
 
 
 def get_json_info(detected_img_dir):
@@ -79,17 +81,19 @@ def copy_intersect_img_xml(detected_info, detected_img_name, category_id, src_im
     # detected_img_name = 'Chanel-2-doing_710803_金属件_sign.jpg'
     xml_name = detected_img_name.rsplit('.', 1)[0]+'.xml'
     src_xml_path = os.path.join(src_xml_dir, xml_name)
+    get_total = 0
     if os.path.exists(src_xml_path):
-        detected_xyxy = get_detected_xyxy_of_category(detected_info, detected_img_name, category_id)
-        if check_if_intersect(src_xml_path, detected_xyxy):
-            src = os.path.join(src_img_dir, detected_img_name)
-            dst = os.path.join(dst_img_dir, detected_img_name)
-            shutil.copy(src, dst)
-            src = os.path.join(src_xml_dir, xml_name)
-            dst = os.path.join(dst_xml_dir, xml_name)
-            shutil.copy(src, dst)
-            return True
-    return False
+        detected_xyxys = get_detected_xyxy_of_category(detected_info, detected_img_name, category_id)
+        for detected_xyxy in detected_xyxys:
+            if check_if_intersect(src_xml_path, detected_xyxy):
+                src = os.path.join(src_img_dir, detected_img_name)
+                dst = os.path.join(dst_img_dir, detected_img_name)
+                shutil.copy(src, dst)
+                src = os.path.join(src_xml_dir, xml_name)
+                dst = os.path.join(dst_xml_dir, xml_name)
+                shutil.copy(src, dst)
+                get_total += 1
+    return get_total
 
 def get_category_names(categories_file):
     with open(categories_file, 'r') as f:
@@ -99,9 +103,10 @@ def get_category_names(categories_file):
 
 
 
+from tool1_gennrate_yolov5label import brand, part
+# brand = 'Chanel'
+# part = 'sign'
 if __name__ == "__main__":
-    brand = 'Chanel'
-    part = 'sign'
     detected_img_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_2_handle/1detect_select_ok'
     categories_file = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/categories.txt'
     src_img_dir = src_xml_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_2_need_已鉴定标记_包含标签旋转后'
@@ -111,7 +116,7 @@ if __name__ == "__main__":
     categories = get_category_names(categories_file)
 
     for img_name in img_names:
-        if len(detected_info[img_name])!=len(categories):
+        if len(detected_info[img_name]) != len(categories):
             warnings.warn(f'{img_name} 可能未准确识别到')
     print('all_categories: ', categories)
     dst_p_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_2_handle/2与1重复出现且对某字母打了标签的'
@@ -126,8 +131,7 @@ if __name__ == "__main__":
         category_id = categories.index(category)
         total = 0
         for img_name in img_names:
-            if copy_intersect_img_xml(detected_info, img_name, category_id, src_img_dir, src_xml_dir, dst_img_dir, dst_xml_dir):
-                total += 1
+            total += copy_intersect_img_xml(detected_info, img_name, category_id, src_img_dir, src_xml_dir, dst_img_dir, dst_xml_dir)
         copied_img_names = os.listdir(dst_img_dir)
 
         detected_selected_info = {}

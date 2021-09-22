@@ -5,9 +5,11 @@
 # @Author    :Yangliang
 import os
 
+from tool1_gennrate_yolov5label import brand, part
+# brand = 'Chanel'
+# part = 'sign'
+
 if __name__ == "__main__":
-    brand = 'Chanel'
-    part = 'sign'
     path = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}'
     augmented_imgs_dir = os.path.join(path, 'augmented_imgs_select')
     labels_path = os.path.join(path, 'labels')

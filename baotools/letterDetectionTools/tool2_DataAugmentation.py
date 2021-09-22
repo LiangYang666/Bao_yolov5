@@ -4,6 +4,7 @@
 # @Time      :2021/8/3 下午5:16
 # @Author    :Yangliang
 import os
+import shutil
 from tkinter import Tk
 
 import cv2
@@ -12,6 +13,10 @@ import imgaug as ia
 import imgaug.augmenters as iaa
 from matplotlib import pyplot as plt
 from tqdm import tqdm
+from tool1_gennrate_yolov5label import brand, part
+# brand = 'LV'
+# part = 'sign'
+
 
 sometimes = lambda aug: iaa.Sometimes(0.5, aug)
 imgaug_seq = iaa.Sequential(
@@ -99,6 +104,7 @@ imgaug_seq = iaa.Sequential(
     random_order=True
 )
 
+
 def aug_one_image(image, aug_seq):
     return aug_seq(images=[image])[0]
 
@@ -128,6 +134,7 @@ def load_batch(batch_idx):
 def train_on_images(images):
     # dummy function, implement this
     pass
+
 
 seq_test = iaa.Sequential([
     # iaa.Sometimes(0.8, iaa.AddToHueAndSaturation((-50, 50))),  # change hue and saturation
@@ -189,9 +196,8 @@ seq_test = iaa.Sequential([
     # iaa.ChangeColorTemperature((1100, 10000))
 ])
 
-def aug_save_img(aug_times = 100):
-    src_images_dir = "/media/D_4TB/YL_4TB/BaoDetection/data/Chanel/LetterDetection/data/sign/imgxmls"
-    aug_img_dir = '/media/D_4TB/YL_4TB/BaoDetection/data/Chanel/LetterDetection/data/sign/augmented_imgs'
+
+def aug_save_img(src_images_dir, aug_img_dir, aug_times = 100):
     files = sorted(os.listdir(src_images_dir))
     img_suffixs = ['jpg', 'jpeg', 'png', 'tif']
     files = [x for x in files if x.rsplit('.', 1)[-1].lower() in img_suffixs]
@@ -209,9 +215,8 @@ def aug_save_img(aug_times = 100):
             plt.imsave(file_path, aug_img)
 
 
-
-
-def main():
+def test():
+    # 测试
     images = load_batch(0)
     # images_aug = seq(images=images)
     # images_aug = seq_test(images=images)
@@ -246,16 +251,18 @@ def main():
 
 
 if __name__ == "__main__":
-    aug_save_img(aug_times=100)
+
+    src_images_dir = f"/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/imgxmls"
+    aug_img_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/augmented_imgs'
+    if os.path.exists(aug_img_dir):
+        shutil.rmtree(aug_img_dir)
+    os.mkdir(aug_img_dir)
+    aug_save_img(src_images_dir, aug_img_dir, aug_times=100)
 
     exit(0)
 
-
-    main()
-
+    test()
     images = load_batch(0)
-
-
 
     # images = np.random.randint(0, 255, (16, 128, 128, 3), dtype=np.uint8)
     seq = iaa.Sequential([iaa.Fliplr(0.5), iaa.GaussianBlur((0, 3.0))])

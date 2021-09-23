@@ -10,9 +10,6 @@ import os
 import shutil
 
 from tool5_cut_intersect_letter_imgxml import get_json_info, get_category_names
-from tool1_gennrate_yolov5label import brand, part
-# brand = 'Chanel'
-# part = 'sign'
 
 
 def copy_detect_ok(src_img_dir, dst_img_dir, categories_file):
@@ -36,7 +33,9 @@ def copy_detect_ok(src_img_dir, dst_img_dir, categories_file):
 
 
 if __name__ == "__main__":
-
+    from tool1_gennrate_yolov5label import brand, part
+    # brand = 'Chanel'
+    # part = 'sign'
     src_img_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/yolov5_rundata/dect/exp_ckp_aug_all_6c_epoch1760_2'
     dst_img_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_1_handle/1detect_select_ok/'
     categories_file = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/categories.txt'

@@ -26,10 +26,11 @@ def trans_img_2_new_dir(src_img_dir, dst_img_dir):
         img.save(dst_img_path)
 
 
-from tool1_gennrate_yolov5label import brand, part
-# brand = 'Chanel'
-# part = 'sign'
+
 if __name__ == "__main__":
+    from tool1_gennrate_yolov5label import brand, part
+    # brand = 'Chanel'
+    # part = 'sign'
     src_img_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_1_need'
     dst_img_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_1_need_旋转后图片'
     trans_img_2_new_dir(src_img_dir, dst_img_dir)

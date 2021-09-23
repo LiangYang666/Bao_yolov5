@@ -1,0 +1,15 @@
+names:
+- L
+- O
+- U
+- I
+- S
+- V
+- T
+- N
+- P
+- A
+- R
+nc: 11
+test: /media/D_4TB/YL_4TB/BaoDetection/data/LV/LetterDetection/data/sign/all.txt
+train: /media/D_4TB/YL_4TB/BaoDetection/data/LV/LetterDetection/data/sign/all.txt

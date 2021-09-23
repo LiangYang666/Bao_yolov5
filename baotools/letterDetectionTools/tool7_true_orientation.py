@@ -8,7 +8,9 @@ import os
 from PIL import Image, ImageOps
 from tqdm import tqdm
 
+
 # 实现对真类图片的翻转，按照exif信息翻转保存，保存的新图片不含exif信息，避免不同读取图片模块读入结果不同
+
 
 def trans_img_2_new_dir(src_img_dir, dst_img_dir):
     img_suffixs = ['jpg', 'jpeg', 'png', 'tif']
@@ -19,13 +21,15 @@ def trans_img_2_new_dir(src_img_dir, dst_img_dir):
     for img_name in tqdm(img_names):
         img_path = os.path.join(src_img_dir, img_name)
         img = Image.open(img_path)
-        exif_data = img._getexif()
         dst_img_path = os.path.join(dst_img_dir, img_name)
         img = ImageOps.exif_transpose(img)
         img.save(dst_img_path)
 
 
+from tool1_gennrate_yolov5label import brand, part
+# brand = 'Chanel'
+# part = 'sign'
 if __name__ == "__main__":
-    src_img_dir = '/media/D_4TB/YL_4TB/BaoDetection/data/Chanel/LetterDetection/data/sign/sign_1_need'
-    dst_img_dir = '/media/D_4TB/YL_4TB/BaoDetection/data/Chanel/LetterDetection/data/sign/sign_1_need_旋转后图片'
+    src_img_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_1_need'
+    dst_img_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_1_need_旋转后图片'
     trans_img_2_new_dir(src_img_dir, dst_img_dir)

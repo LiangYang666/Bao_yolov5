@@ -11,11 +11,11 @@ import warnings
 import cv2
 
 # 裁剪正确检测到的字母，将字母复制到指定文件夹
+from tool1_gennrate_yolov5label import brand, part
+# brand = 'Chanel'
+# part = 'sign'
 
 if __name__ == "__main__":
-    brand = 'Chanel'
-    part = 'sign'
-    # detected_selected_info
 
     categories_file = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/categories.txt'
     src_img_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_1_need_旋转后图片'  # 待裁剪的图片位置

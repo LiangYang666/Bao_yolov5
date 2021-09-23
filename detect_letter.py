@@ -20,7 +20,7 @@ from utils.plots import plot_images, output_to_target
 from tqdm import tqdm
 # from zizhuantools.tool3_labelresp import class_names
 
-class_names = ['C', 'H', 'A', 'N', 'E', 'L']
+
 
 
 def detect(save_img=False):
@@ -30,6 +30,10 @@ def detect(save_img=False):
     #     ('rtsp://', 'rtmp://', 'http://'))
     if not source.startswith('/'):
         source = os.path.join(opt.data_dir, source)
+
+    with open(os.path.join(opt.data_dir, 'categories.txt'), 'r') as f:
+        class_names = f.readlines()
+        class_names = [x.strip() for x in class_names]
 
     # Directories
     save_name_add = os.path.basename(str(weights)).split('.')[0]  # 名称中要增加保存的字符
@@ -133,13 +137,13 @@ def detect(save_img=False):
                     n = (det[:, -1] == c).sum()  # detections per class
                     s += '%g %ss, ' % (n, names[int(c)])  # add to string
 
-                save_each_cut = True
-                if save_each_cut:
+                save_each_plot = True
+                if save_each_plot:
                     img_orgin = cv2.imread(str(p))
+                    h, w = img_orgin.shape[:2]
 
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
-
                     if save_json_path:
                         # xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                         # xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4))).view(-1).tolist()  # normalized xywh
@@ -150,12 +154,17 @@ def detect(save_img=False):
                         confidence = round(conf.cpu().view(-1).tolist()[0], 2)
                         # print('conf', confidence)
                         # print(type(confidence))
+
+                        # 可选判断
+                        if opt.brand == "LV" and opt.part == "sign":
+                            if (y0+y1)/2 >= 2*(h/3):
+                                continue
+
                         dict = {'cut_name': p.name, 'cut_category': category,
                                 'confidence': confidence, 'bbox': [x0, y0, x1, y1]}
                         dectjson_list.append(dict)
 
-                        if save_each_cut:
-                            h, w = img_orgin.shape[:2]
+                        if save_each_plot:
                             l = max(h, w)
                             fontScale = l/1000
                             thickness = max(1, l//300)
@@ -164,7 +173,7 @@ def detect(save_img=False):
                             cv2.putText(img_orgin, f'{dis_name} {confidence}', (x0, y0+l//40), cv2.FONT_HERSHEY_SIMPLEX,
                                         fontScale=fontScale, color=(0, 255, 255),
                                         thickness=thickness)
-                if save_each_cut:
+                if save_each_plot:
                     cv2.imwrite(save_path, img_orgin)
         import json
         if batch_i % 5 == 0:

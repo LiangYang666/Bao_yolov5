@@ -52,8 +52,8 @@ if __name__ == "__main__":
                 detected_xyxys = detected_selected_info[img_name][str(category_id)]
                 for i, detected_xyxy in enumerate(detected_xyxys):
                     x1, y1, x2, y2 = detected_xyxy
-                    img = img[y1:y2+1, x1:x2+1]
+                    img_cut = img[y1:y2+1, x1:x2+1]
                     img_save_path = os.path.join(dst_img_dir, img_name)
                     temp = img_save_path.rsplit('.', 1)
                     img_save_path = f'{temp[0]}_{i}.{temp[1]}'
-                    cv2.imwrite(img_save_path, img)
+                    cv2.imwrite(img_save_path, img_cut)

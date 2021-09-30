@@ -15,14 +15,15 @@ from tqdm import tqdm
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Letter Training')
-    parser.add_argument('--brand', type=str, default='Chanel')
+    parser.add_argument('--brand', type=str, default='LV')
     parser.add_argument('--part', type=str, default='sign')
-    parser.add_argument('--letter', type=str, default='C')
+    parser.add_argument('--letter', type=str, default='A')
     args = parser.parse_args()
     log_txt_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{args.brand}/LetterDetection/data/{args.part}/classification_rundata/{args.letter}/log'
 
     log_txt_files = sorted(os.listdir(log_txt_dir))
     log_txt_files = [x for x in log_txt_files if x.endswith('.txt')]
+
     for path in tqdm(log_txt_files):
         log_txt_path = os.path.join(log_txt_dir, path)
         with open(log_txt_path, 'r') as f:
@@ -32,9 +33,10 @@ if __name__ == "__main__":
         for line in lines:
             line = line.strip()
             if model is None:
-                if "'model': " in line:
-                    model = line.split("'model': ")[1].strip().strip("'")
-                    print(model)
+                model = path
+                # if "'model': " in line:
+                #     model = line.split("'model': ")[1].strip().strip("'")
+                #     print(model)
             else:
                 if "INFO: Epoch:" in line:
                     # searchObj = re.search(r'(.*) are (.*?) .*', line, re.M | re.I)
@@ -55,7 +57,4 @@ if __name__ == "__main__":
                 writer.add_scalar(tag="test/acc",   global_step=step, scalar_value=rate[3])
                 writer.add_scalar(tag="test/true",  global_step=step, scalar_value=rate[4])
                 writer.add_scalar(tag="test/fake",  global_step=step, scalar_value=rate[5])
-
-
-
 

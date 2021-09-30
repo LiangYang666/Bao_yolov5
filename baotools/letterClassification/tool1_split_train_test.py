@@ -7,11 +7,12 @@ import os
 import random
 import shutil
 
-from baotools.letterDetectionTools.tool5_get_intersect_letter_imgxml import get_category_names
+from baotools.letterDetectionTools.tool5_cut_intersect_letter_imgxml import get_category_names
+
+brand = 'LV'
+part = 'sign'
 
 if __name__ == "__main__":
-    brand = 'Chanel'
-    part = 'sign'
 
     true_imgs_P_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_1_handle/2裁剪后正确真类字母'
     fake_imgs_P_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_2_handle/3裁剪后鉴定有问题的字母图片'
@@ -53,6 +54,7 @@ if __name__ == "__main__":
         category_fake_files = os.listdir(os.path.join(fake_imgs_P_dir, category))
         category_fake_imgs = [x for x in category_fake_files if x.rsplit('.', 1)[-1].lower() in img_suffixs]
         min_img_n = min(len(category_true_imgs), len(category_fake_imgs))
+        random.seed(1)      # 指定随机种子
         random.shuffle(category_true_imgs)
         random.shuffle(category_fake_imgs)
         print("3---复制图片")

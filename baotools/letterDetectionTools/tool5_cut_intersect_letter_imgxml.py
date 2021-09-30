@@ -41,7 +41,7 @@ def check_if_intersect(xml_path, xyxy):
         x2 = int(bandbox.find('xmax').text)
         y2 = int(bandbox.find('ymax').text)
         if calculate_iou(xyxy, [x1, y1, x2, y2]) > 0.2:
-            print(xml_path, calculate_iou(xyxy, [x1, y1, x2, y2]))
+            # print(xml_path, calculate_iou(xyxy, [x1, y1, x2, y2]))
             return name
     return False
 
@@ -134,10 +134,12 @@ def remove_and_rebuild(*dirs):
 
 
 
-from tool1_gennrate_yolov5label import brand, part
-# brand = 'Chanel'
-# part = 'sign'
 if __name__ == "__main__":
+    from tool1_gennrate_yolov5label import brand, part
+
+    # brand = 'Chanel'
+    # part = 'sign'
+
     detected_img_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_2_handle/1detect_select_ok'
     categories_file = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/categories.txt'
     src_img_dir = src_xml_dir = f'/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/{part}_2_need_已鉴定标记_包含标签旋转后'

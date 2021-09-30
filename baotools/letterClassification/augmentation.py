@@ -40,10 +40,13 @@ brand = "LV"
 part = "sign"
 letter = "O"
 
-def augment_imgs(src_dir, dst_dir):
-
+def augment_imgs(src_dir):
+    dst_dir = src_dir+"_aug"
+    dis_dir = src_dir+"_display"
     if not os.path.exists(dst_dir):
         os.mkdir(dst_dir)
+    if not os.path.exists(dis_dir):
+        os.mkdir(dis_dir)
 
     # 创建sr对象
     sr = dnn_superres.DnnSuperResImpl_create()
@@ -54,24 +57,35 @@ def augment_imgs(src_dir, dst_dir):
     for sub_dir in os.listdir(src_dir):
         src_sub_dir_path = os.path.join(src_dir, sub_dir)
         dst_sub_dir_path = os.path.join(dst_dir, sub_dir)
-        if os.path.exists(os.path.join(dst_dir, sub_dir)):
+        dis_sub_dir_path = os.path.join(dis_dir, sub_dir)
+        if os.path.exists(dst_sub_dir_path):
             shutil.rmtree(dst_sub_dir_path)
         os.mkdir(dst_sub_dir_path)
+        if os.path.exists(dis_sub_dir_path):
+            shutil.rmtree(dis_sub_dir_path)
+        os.mkdir(dis_sub_dir_path)
+
         for img_file in tqdm(sorted(os.listdir(src_sub_dir_path))):
             img_orgin = cv2.imread(os.path.join(src_sub_dir_path, img_file))
             # img = cv2.resize(img_orgin, dsize=None, fx=16, fy=16)
             img1 = hisEqulColor(img_orgin)
             img2 = adaptiveHisEqulColor(img_orgin)
             img3 = cv2.normalize(img_orgin, dst=None, alpha=350, beta=10, norm_type=cv2.NORM_MINMAX)
-            upScalePic = sr.upsample(img3)
+            img4 = sr.upsample(img3)
             # upScalePic = sr.upsample(upScalePic)
-            res = np.hstack((img_orgin, img1, img2, img3))
-            res = cv2.resize(res, dsize=None, fx=4, fy=4)
-            res = np.hstack((res, upScalePic))
-            # cv2.imshow(res)
-            cv2.imwrite(os.path.join(dst_sub_dir_path, img_file), res)
+            if True:
+                res = np.hstack((img_orgin, img1, img2, img3))
+                res = cv2.resize(res, dsize=None, fx=4, fy=4)
+                res = np.hstack((res, img4))
+                # cv2.imshow(res)
+                cv2.imwrite(os.path.join(dis_sub_dir_path, img_file), res)
+
+            for i, img_save in enumerate([img_orgin, img1, img2, img3, img4]):
+                img_name = f"_aug{i}.".join(img_file.rsplit('.', 1))
+                cv2.imwrite(os.path.join(dst_sub_dir_path, img_name), img_save)
+
 
 if __name__ == '__main__':
     data_dir = f"/media/D_4TB/YL_4TB/BaoDetection/data/{brand}/LetterDetection/data/{part}/classification_data/{letter}"
-    augment_imgs(os.path.join(data_dir, "train"), os.path.join(data_dir, "train_aug"))
-    augment_imgs(os.path.join(data_dir, "test"), os.path.join(data_dir, "test_aug"))
+    augment_imgs(os.path.join(data_dir, "train"))
+    augment_imgs(os.path.join(data_dir, "test"))

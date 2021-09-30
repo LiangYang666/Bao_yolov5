@@ -6,6 +6,7 @@
 import torch
 import torchvision
 import torch.nn as nn
+import timm
 
 
 class FirstFeature(nn.Module):
@@ -19,8 +20,8 @@ class FirstFeature(nn.Module):
         self.leakyrelu = nn.LeakyReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
-
     def forward(self, x):
+        # out11 = self.maxpool(self.leakyrelu(self.conv11(x)))
         out11 = self.maxpool(self.leakyrelu(self.batchnorm(self.conv11(x))))
         # out12 = self.maxpool(self.leakyrelu(self.batchnorm(self.conv12(x))))
         # out13 = self.maxpool(self.leakyrelu(self.batchnorm(self.conv13(x))))
@@ -44,7 +45,7 @@ class SecondFeature(nn.Module):
         x = self.leakyrelu(self.conv21(x))
         x = self.leakyrelu(self.conv22(x))
         x = self.leakyrelu(self.conv23(x))
-        return self.maxpool(x0*x)
+        return self.maxpool(x0+x)
 
 
 class ThirdFeature(nn.Module):
@@ -128,6 +129,7 @@ class MyNet2(nn.Module):
         return x
 
 
+
 def get_model(name='resnet34', pretrained=False, num_classes=2):
 
     # 模型
@@ -157,7 +159,8 @@ def get_model(name='resnet34', pretrained=False, num_classes=2):
 
 if __name__ == "__main__":
     # 模型测试
-    model = get_model('mynet1')
+    # model = get_model('mynet1')
+    model = timm.create_model('efficientnet_b0', num_classes=2)    # timm.list_models()
     input = torch.randn(1, 3, 400, 400)
     o = model(input)
     print(o.shape)
